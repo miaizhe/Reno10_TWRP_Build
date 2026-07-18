@@ -1,7 +1,7 @@
 name: Build TWRP Reno10
 
 on:
-  workflow_dispatch: # 手动触发编译
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
     - name: 检出代码
       uses: actions/checkout@v3
 
-    - name: 清理磁盘空间 (极其重要)
+    - name: 清理磁盘空间
       run: |
         sudo docker image prune -a -f
         sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
@@ -32,37 +32,29 @@ jobs:
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
 
-    - name: 同步 TWRP 源码 (12.1 分支)
+    - name: 同步 TWRP 源码 (14.1 分支)
       run: |
         mkdir work
         cd work
-        git config --global user.name "AI"
-        git config --global user.email "ai@example.com"
+        git config --global user.name "miaizhe"
+        git config --global user.email "ftyfty2021@163.com"
         repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-14.1
         repo sync -j$(nproc --all) --force-sync
 
     - name: 载入设备树
       run: |
-        # 1. 先把当前仓库的文件（设备树）移动到一个临时目录，避免 cp 时的递归冲突
         mkdir -p temp_device_tree
-        # 排除 .git 和 work 目录，拷贝其余所有文件
         rsync -av --exclude='.git' --exclude='work' ./ temp_device_tree/
-        
-        # 2. 创建目标路径并移动过去
         cd work
         mkdir -p device/oppo/PHW110
         cp -r ../temp_device_tree/* device/oppo/PHW110/
-        
-        # 3. 验证一下文件是否放对了（可选，方便看日志排错）
         ls -R device/oppo/PHW110
 
     - name: 开始编译
       run: |
         cd work
         source build/envsetup.sh
-        # 使用你提到的 omni_lahaina
         lunch omni_lahaina-eng
-        # 编译 boot
         mka bootimage -j$(nproc)
 
     - name: 上传镜像
