@@ -27,19 +27,19 @@ jobs:
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
 
-    - name: 4. 同步 TWRP 源码 (12.1 分支)
+    - name: 4. 同步 TWRP 源码 (14.1 分支)
       run: |
         mkdir twrp
         cd twrp
         git config --global user.email "twrp@build.me"
         git config --global user.name "twrp"
-        repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
+        repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-14.1
         repo sync -j$(nproc) --force-sync --no-tags --no-clone-bundle
 
     - name: 5. 克隆设备树
       run: |
         cd twrp
-        git clone https://github.com/WenHao-Dev/twrp_device_oppo_taylor.git device/oppo/taylor
+        git clone https://github.com/miaizhe/twrp_device_oppo_taylor.git device/oppo/taylor
         rm -r device/oppo/taylor/prebuilts/Image
         wget https://github.com/miaizhe/twrp_device_oppo_taylor/releases/download/boot/Image -o device/oppo/taylor/prebuilts/Image
 
@@ -49,7 +49,6 @@ jobs:
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         lunch twrp_taylor-eng
-        # 对于 A/B 设备，强制编译所有可能包含 Recovery 的目标
         mka bootimage -j$(nproc)
 
     - name: 7. 上传产物
