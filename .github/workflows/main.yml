@@ -26,13 +26,13 @@ jobs:
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
 
-    - name: 4. 同步 TWRP 源码 (14.1 分支)
+    - name: 4. 同步 TWRP 源码 (12.1 分支)
       run: |
         mkdir twrp
         cd twrp
         git config --global user.email "twrp@build.me"
         git config --global user.name "twrp"
-        repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-14.1
+        repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
         repo sync -j$(nproc) --force-sync --no-tags --no-clone-bundle
 
     - name: 5. 克隆设备树
@@ -47,7 +47,7 @@ jobs:
         cd twrp
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
-        lunch twrp_taylor-ap2a-eng
+        lunch twrp_taylor-eng
         mka bootimage -j$(nproc)
 
     - name: 7. 上传产物
