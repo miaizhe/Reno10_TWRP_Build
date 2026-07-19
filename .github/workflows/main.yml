@@ -47,7 +47,7 @@ jobs:
         cd twrp
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
-        lunch twrp_taylor-eng
+        lunch twrp_taylor-trunk_staging-eng
         mka bootimage -j$(nproc)
 
     - name: 7. 上传产物
